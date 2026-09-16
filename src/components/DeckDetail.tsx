@@ -1,5 +1,5 @@
 import type { Deck, DeckStats, ResolvedEntry } from "../domain/types";
-import { formatJpy } from "../domain/selectors";
+import { deckPriceRange, formatJpy, priceRange } from "../domain/selectors";
 import { ImportanceBadge, RiskBadge, TrendBadge } from "./badges";
 
 interface Props {
@@ -9,6 +9,10 @@ interface Props {
 }
 
 export function DeckDetail({ deck, stats, entries }: Props) {
+  const range = deckPriceRange(
+    deck,
+    new Map(entries.map((r) => [r.card.id, r.card])),
+  );
   return (
     <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -25,6 +29,12 @@ export function DeckDetail({ deck, stats, entries }: Props) {
             </span>
             <span className="rounded-full bg-red-50 px-2 py-0.5 text-red-700">
               必須 {formatJpy(stats.mustJpy)}
+            </span>
+            <span
+              className="rounded-full bg-sky-50 px-2 py-0.5 text-sky-800"
+              title="特価・パラレルを含む全ソースから算出"
+            >
+              最安揃え {formatJpy(range.minTotalJpy)} 〜 最高 {formatJpy(range.maxTotalJpy)}
             </span>
           </div>
         </div>
@@ -55,7 +65,10 @@ export function DeckDetail({ deck, stats, entries }: Props) {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {entries.map((r) => (
+            {entries.map((r) => {
+              const pr = priceRange(r.card);
+              const hasRange = pr.samples > 1 && pr.min !== pr.max;
+              return (
               <tr key={r.card.id}>
                 <td className="px-3 py-2">
                   <div className="font-medium text-slate-900">
@@ -94,6 +107,14 @@ export function DeckDetail({ deck, stats, entries }: Props) {
                       </span>
                     )}
                   </div>
+                  {hasRange && (
+                    <div
+                      className="mt-0.5 text-[11px] text-slate-500"
+                      title="特価・パラレルを含む全ソースの最低〜最高"
+                    >
+                      最安 {formatJpy(pr.min)} 〜 最高 {formatJpy(pr.max)}
+                    </div>
+                  )}
                   <div className="mt-1 flex max-w-40 flex-wrap gap-x-2 gap-y-0.5">
                     {r.card.priceSources.map((s) => (
                       <a
@@ -119,7 +140,8 @@ export function DeckDetail({ deck, stats, entries }: Props) {
                   </div>
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>

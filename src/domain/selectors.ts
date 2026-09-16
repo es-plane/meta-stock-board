@@ -11,6 +11,32 @@ export function indexCards(cards: Card[]): Map<string, Card> {
   return new Map(cards.map((c) => [c.id, c]));
 }
 
+/** 価格ソース群から最低値〜最高値。派生版（特価・パラレル）も含む。価格つきソースがなければ採用単価にフォールバック */
+export function priceRange(card: Card): { min: number; max: number; samples: number } {
+  const prices = card.priceSources
+    .map((s) => s.priceJpy)
+    .filter((p): p is number => typeof p === "number");
+  if (prices.length === 0) return { min: card.priceJpy, max: card.priceJpy, samples: 0 };
+  return { min: Math.min(...prices), max: Math.max(...prices), samples: prices.length };
+}
+
+/** デッキ1面分の最安揃え〜最高値揃えの合計 */
+export function deckPriceRange(
+  deck: Deck,
+  cards: Map<string, Card>,
+): { minTotalJpy: number; maxTotalJpy: number } {
+  let minTotalJpy = 0;
+  let maxTotalJpy = 0;
+  for (const e of deck.entries) {
+    const card = cards.get(e.cardId);
+    if (!card) continue;
+    const r = priceRange(card);
+    minTotalJpy += r.min * e.copies;
+    maxTotalJpy += r.max * e.copies;
+  }
+  return { minTotalJpy, maxTotalJpy };
+}
+
 /** デッキの採用行を Card と結合する。欠損カードは除外する */
 export function resolveEntries(deck: Deck, cards: Map<string, Card>): ResolvedEntry[] {
   const out: ResolvedEntry[] = [];

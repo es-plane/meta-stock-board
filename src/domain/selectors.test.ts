@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   crossDeckDemand,
+  deckPriceRange,
   formatJpy,
   indexCards,
+  priceRange,
   resolveEntries,
   scoreDeck,
   statsDeck,
@@ -60,6 +62,28 @@ describe("statsDeck / scoreDeck", () => {
   });
 });
 
+describe("priceRange / deckPriceRange", () => {
+  it("ガンダムのレンジは特価50〜パラレル1680", () => {
+    const gundam = CARDS.find((c) => c.setCode === "GD01-001")!;
+    expect(priceRange(gundam)).toEqual({ min: 50, max: 1680, samples: 4 });
+  });
+
+  it("単一ソースはmin=maxになる", () => {
+    const leo = CARDS.find((c) => c.setCode === "GD01-012")!;
+    expect(priceRange(leo)).toEqual({ min: 30, max: 30, samples: 1 });
+  });
+
+  it("価格つきソースなしは採用単価にフォールバック", () => {
+    const bare = { ...CARDS[2], priceSources: [] };
+    expect(priceRange(bare)).toEqual({ min: 30, max: 30, samples: 0 });
+  });
+
+  it("青連邦の最安揃え700〜最高82100", () => {
+    const deck = DECKS.find((d) => d.id === "gcg-blue-federation")!;
+    // min: 50*4+80*4+30*4+30*2=700、max: 1680*4+18800*4+30*4+30*2=82100
+    expect(deckPriceRange(deck, cardsById)).toEqual({ minTotalJpy: 700, maxTotalJpy: 82100 });
+  });
+});
 describe("crossDeckDemand", () => {
   it("物資の輸送が3デッキ採用で首位になる", () => {
     const rows = crossDeckDemand(DECKS, idx(CARDS));
