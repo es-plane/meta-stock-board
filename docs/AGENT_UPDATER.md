@@ -29,6 +29,7 @@
    価格には必ず `priceSources`（1件以上のhttpsリンク＋確認日）を付け、確認済みのみ
    `priceVerified: true` にする。中央値を使い、最安単独は使わない。
    ソースの主役はメルカード（品番keyword検索＋商品ページ）。公式カードリストは使わない。
+   PTCGはメルカードポケモン部が503のため、gamepedia相場＋cardrush＋遊々亭を主役にする。
 4. `stockNote` をせどり視点で1–2文に要約し直す（煽り表現なし）。
 5. `npm run typecheck && npm run build` を実行し、結果をレポートに添付。
 6. 確信度が低い項目は値を変えず `update-report.md` の「未確定」に残す（幻覚で相場を作らない）。

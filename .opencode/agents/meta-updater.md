@@ -30,7 +30,8 @@ model: musespark-1.3
    ソースで確認できたものだけ `priceVerified: true` にする。
    ソースの主役はメルカード: `src/data/catalog.ts` の `mercardSearch(品番)` で検索し、
    商品ページの通常版価格を採用する。公式カードリスト（gundam-gcg.com）は使わない。
-   レアリティ・品番もメルカードの検索結果・商品ページで確認する。
+   PTCGはメルカードポケモン部が503のため、gamepedia相場＋cardrush＋遊々亭を主役にする。
+   レアリティ・品番も各主役ソースの検索結果・商品ページで確認する。
 5. `stockNote` はせどり視点で1–2文に要約し直す（煽り表現なし）。
 6. 検証: `npm run typecheck && npm run test -- --run && npm run build` を実行する。
 7. `update-report.md`（作業ディレクトリ直下に出力せず、応答本文に含める）に

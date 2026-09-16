@@ -90,6 +90,46 @@ describe("crossDeckDemand", () => {
     expect(rows[0].card.id).toBe("gcg-gd01-102");
     expect(rows[0].deckCount).toBe(3);
   });
+
+  it("ボスの指令がポケカ3デッキで共有される", () => {
+    const rows = crossDeckDemand(
+      DECKS.filter((d) => d.gameId === "pokemon"),
+      idx(CARDS),
+    );
+    const boss = rows.find((r) => r.card.id === "ptcg-mem-016")!;
+    expect(boss.deckCount).toBe(3);
+  });
+});
+
+describe("ポケカ環境", () => {
+  const ptcgDecks = DECKS.filter((d) => d.gameId === "pokemon");
+
+  it("現行環境に3デッキあり全採用カードが解決できる", () => {
+    expect(ptcgDecks.length).toBe(3);
+    for (const d of ptcgDecks) {
+      expect(resolveEntries(d, cardsById).length).toBe(d.entries.length);
+      for (const r of d.results) {
+        expect(r.deckId).toBe(d.id);
+      }
+    }
+  });
+
+  it("ドラパルトの合計1740・必須360が手計算と一致する", () => {
+    const deck = DECKS.find((d) => d.id === "ptcg-dorapalto")!;
+    const resolved = resolveEntries(deck, cardsById);
+    const stats = statsDeck(deck, resolved);
+    // 120*3+80*2+220*2+80*2+120*1+170*2+80*2 = 1740
+    expect(stats.totalJpy).toBe(1740);
+    // must: 120*3 = 360
+    expect(stats.mustJpy).toBe(360);
+  });
+
+  it("主役3枚の型番・価格が確定値である", () => {
+    const byCode = new Map(CARDS.filter((c) => c.gameId === "pokemon").map((c) => [c.setCode, c]));
+    expect(byCode.get("SV6-081/101")!.priceJpy).toBe(120);
+    expect(byCode.get("SV5K-053/071")!.priceJpy).toBe(180);
+    expect(byCode.get("M1L-029/063")!.priceJpy).toBe(180);
+  });
 });
 
 describe("catalog品質（価格ソース）", () => {
@@ -145,7 +185,18 @@ describe("catalog品質（価格ソース）", () => {
       for (const s of c.priceSources) {
         expect(s.url).not.toContain("gundam-gcg.com");
       }
-      expect(c.priceSources.some((s) => s.url.includes("mercardgundam.jp"))).toBe(true);
+      if (c.gameId === "gundam") {
+        expect(c.priceSources.some((s) => s.url.includes("mercardgundam.jp"))).toBe(true);
+      } else {
+        // PTCG: メルカードポケモン部は503のため gamepedia/cardrush/遊々亭等が主役
+        expect(
+          c.priceSources.some((s) =>
+            ["gamepedia", "cardrush", "yuyu-tei.jp", "tcgprice", "torecacamp", "pokeka-atari"].some(
+              (d) => s.url.includes(d),
+            ),
+          ),
+        ).toBe(true);
+      }
     }
   });
 

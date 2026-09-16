@@ -35,6 +35,7 @@ Deck 1──< TopResult（入賞実績: 大会・日付・順位・参加人数�
   確認できたものだけ `priceVerified: true` にする。未確認は `false` のまま「参考」表示になる。
 - **価格ソースの主役はメルカード**（`mercardSearch(品番)`＝品番keyword検索＋個別商品ページ）。
   公式カードリスト（gundam-gcg.com）は使い物にならないため参照リンクに使わない（テストで禁止を固定）。
+  PTCGはメルカードポケモン部が503のため、gamepedia相場＋cardrush＋遊々亭が主役（テストで固定）。
 - パラレル版（LR+/LR++等）は別相場。`priceSources[].note` に区別を明記する。
 - レアリティ・品番はメルカードの検索結果・商品ページで確認する。
 - 環境切替わりは `Environment` を追加し `isCurrent` を付け替え。旧環境の `Deck` は残す（履歴）。
