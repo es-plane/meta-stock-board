@@ -26,6 +26,8 @@
 1. `ENVIRONMENTS` で現行環境を確認。改訂があれば新 `Environment` を追加。
 2. ソースを3件以上参照し、デッキごとに `entries/sharePct/topCount/results` を更新。
 3. カード相場を更新（`priceJpy/priceUpdatedAt/trend` セット更新、`reprintRisk` 見直し）。
+   価格には必ず `priceSources`（1件以上のhttpsリンク＋確認日）を付け、確認済みのみ
+   `priceVerified: true` にする。中央値を使い、最安単独は使わない。
 4. `stockNote` をせどり視点で1–2文に要約し直す（煽り表現なし）。
 5. `npm run typecheck && npm run build` を実行し、結果をレポートに添付。
 6. 確信度が低い項目は値を変えず `update-report.md` の「未確定」に残す（幻覚で相場を作らない）。

@@ -75,7 +75,40 @@ export function DeckDetail({ deck, stats, entries }: Props) {
                   <ImportanceBadge value={r.importance} />
                 </td>
                 <td className="px-3 py-2 tabular-nums">×{r.copies}</td>
-                <td className="px-3 py-2 tabular-nums">{formatJpy(r.card.priceJpy)}</td>
+                <td className="px-3 py-2 tabular-nums">
+                  <div>
+                    {formatJpy(r.card.priceJpy)}
+                    {r.card.priceVerified ? (
+                      <span
+                        className="ml-1 rounded bg-emerald-100 px-1 text-[11px] text-emerald-800"
+                        title={`根拠確認済み（${r.card.priceUpdatedAt}）`}
+                      >
+                        確認済
+                      </span>
+                    ) : (
+                      <span
+                        className="ml-1 rounded bg-slate-200 px-1 text-[11px] text-slate-600"
+                        title="サンプル参考値。更新エージェントが検証予定"
+                      >
+                        参考
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-1 flex max-w-40 flex-wrap gap-x-2 gap-y-0.5">
+                    {r.card.priceSources.map((s) => (
+                      <a
+                        key={s.url}
+                        href={s.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[11px] font-normal text-sky-700 underline hover:text-sky-900"
+                        title={`${s.label}${s.priceJpy ? `（${formatJpy(s.priceJpy)}）` : ""} / 確認日 ${s.observedAt}${s.note ? ` / ${s.note}` : ""}`}
+                      >
+                        🔗{s.label}
+                      </a>
+                    ))}
+                  </div>
+                </td>
                 <td className="px-3 py-2 font-bold tabular-nums">
                   {formatJpy(r.lineTotalJpy)}
                 </td>

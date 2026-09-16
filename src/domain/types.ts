@@ -56,6 +56,18 @@ export const IMPORTANCE_WEIGHT: Record<Importance, number> = {
 /** 再録・暴落リスク */
 export type ReprintRisk = "low" | "mid" | "high";
 
+/** 価格の根拠リンク。値段は必ずソースつきで持つ（捏造防止） */
+export interface PriceSource {
+  label: string;
+  url: string;
+  /** 価格を確認した日（YYYY-MM-DD） */
+  observedAt: string;
+  /** そのソースで確認した単価。中央値採用時などは省略可 */
+  priceJpy?: number;
+  /** 「サンプル値・要確認」などの但し書き */
+  note?: string;
+}
+
 export interface Card {
   id: string;
   gameId: GameId;
@@ -71,6 +83,10 @@ export interface Card {
   reprintRisk: ReprintRisk;
   /** 汎用ステープルか（複数デッキで使う＝回転率が高い） */
   staple: boolean;
+  /** 価格の根拠リンク（空禁止）。更新時は priceJpy/priceUpdatedAt/trend とセットで更新する */
+  priceSources: PriceSource[];
+  /** 価格がソースで確認済みか。falseは参考値（UIに「参考」と表示） */
+  priceVerified: boolean;
   externalUrls: string[];
 }
 

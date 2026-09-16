@@ -29,7 +29,7 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(() => {
     const d = new URLSearchParams(window.location.search).get("deck");
-    return DECKS.some((x) => x.id === d) ? (d as string) : "gcg-white-federation";
+    return DECKS.some((x) => x.id === d) ? (d as string) : "gcg-blue-federation";
   });
 
   useEffect(() => {
@@ -251,7 +251,8 @@ export default function App() {
             <div className="rounded-lg border border-slate-200 bg-white p-4 text-xs leading-relaxed text-slate-500">
               <span className="font-bold text-slate-700">凡例・注意: </span>
               重要度（必須/主力/準主力/テック）は仕入れの積み増し優先度。動向↗↘は直近相場の上下、再録高⚠は暴落注意。
-              価格はサンプル（2026-09-16仮置き）で、実運用では更新エージェントが定期更新します。
+              単価の「確認済」は価格ソースで裏付け済み、「参考」はサンプル参考値（🔗から根拠を確認できます）。
+              「参考」価格は実運用では更新エージェントが定期更新します。
               本ボードは在庫判断の補助であり、相場変動リスクを保証しません。
             </div>
           </>

@@ -14,7 +14,8 @@ Deck 1──< TopResult（入賞実績: 大会・日付・順位・参加人数�
 
 - `Game { id: "gundam"|"pokemon", name, status: active|coming-soon }`
 - `Environment { id, gameId, label, season, regulation, startsAt, endsAt, isCurrent }`
-- `Card { id, gameId, name, rarity, setCode, color, priceJpy, priceUpdatedAt, trend: up|flat|down, reprintRisk: low|mid|high, staple: boolean }`
+- `Card { id, gameId, name, rarity, setCode, color, priceJpy, priceUpdatedAt, trend: up|flat|down, reprintRisk: low|mid|high, staple: boolean, priceSources: PriceSource[], priceVerified: boolean }`
+- `PriceSource { label, url, observedAt, priceJpy?, note? }` — 値段の根拠リンク。空禁止
 - `DeckEntry { cardId, copies, importance: must|key|optional|tech }`
 - `Deck { id, gameId, environmentId, name, colors, archetype, sharePct, topCount, lastTopAt, summary, stockNote, entries, results, updatedAt }`
 - `TopResult { event, date, rank, entrants? }`
@@ -29,6 +30,10 @@ Deck 1──< TopResult（入賞実績: 大会・日付・順位・参加人数�
 
 ## 更新ルール（更新エージェント向け）
 - 価格は `priceJpy + priceUpdatedAt + trend` をセットで更新。単価だけ変えない。
+- **価格更新には必ず `priceSources`（1件以上のhttpsリンク＋確認日）を付ける。ソースなしの価格は却下。**
+  確認できたものだけ `priceVerified: true` にする。未確認は `false` のまま「参考」表示になる。
+- パラレル版（LR+/LR++等）は別相場。`priceSources[].note` に区別を明記する。
+- レアリティ・品番は公式カード詳細で確認する（例: GD01-001=LR・青。UR表記は誤りだった実績あり）。
 - 環境切替わりは `Environment` を追加し `isCurrent` を付け替え。旧環境の `Deck` は残す（履歴）。
 - `sharePct/topCount` は推定値でもよいが `sourceUrls/results` の裏付けを残す。
 - ポケカ追加時は `Game(status)` を `active` にし、`gameId: "pokemon"` の行を追加するだけ。UI改修不要。

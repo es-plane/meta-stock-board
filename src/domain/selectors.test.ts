@@ -41,21 +41,21 @@ describe("resolveEntries", () => {
 });
 
 describe("statsDeck / scoreDeck", () => {
-  it("白連邦の合計・必須額が手計算と一致する", () => {
-    const deck = DECKS.find((d) => d.id === "gcg-white-federation")!;
+  it("青連邦の合計・必須額が手計算と一致する", () => {
+    const deck = DECKS.find((d) => d.id === "gcg-blue-federation")!;
     const resolved = resolveEntries(deck, cardsById);
     const stats = statsDeck(deck, resolved);
-    // 3800*4 + 1200*4 + 600*4 + 150*2 = 22700
-    expect(stats.totalJpy).toBe(22700);
-    // must: 3800*4 + 1200*4 = 20000
-    expect(stats.mustJpy).toBe(20000);
+    // 80*4 + 150*4 + 600*4 + 30*2 = 3380
+    expect(stats.totalJpy).toBe(3380);
+    // must: 80*4 + 150*4 = 920
+    expect(stats.mustJpy).toBe(920);
     expect(stats.priorityScore).toBeGreaterThanOrEqual(0);
     expect(stats.priorityScore).toBeLessThanOrEqual(100);
   });
 
   it("シェア首位デッキの優先度が最下位より高い", () => {
     const scored = DECKS.map((d) => scoreDeck(d, resolveEntries(d, cardsById)));
-    // 白(share22, top11) > 青(share9, top4) のはず
+    // 青連邦(share22, top11) > ウイング(share9, top4) のはず
     expect(scored[0]).toBeGreaterThan(scored[2]);
   });
 });
@@ -65,5 +65,34 @@ describe("crossDeckDemand", () => {
     const rows = crossDeckDemand(DECKS, idx(CARDS));
     expect(rows[0].card.id).toBe("gcg-supply-u");
     expect(rows[0].deckCount).toBe(3);
+  });
+});
+
+describe("catalog品質（価格ソース）", () => {
+  it("GD01-001はLR・青である", () => {
+    const gundam = CARDS.find((c) => c.setCode === "GD01-001")!;
+    expect(gundam.rarity).toBe("LR");
+    expect(gundam.color).toBe("青");
+  });
+
+  it("全カードが1件以上のhttps価格ソースを持つ", () => {
+    for (const c of CARDS) {
+      expect(c.priceSources.length).toBeGreaterThanOrEqual(1);
+      for (const s of c.priceSources) {
+        expect(s.url.startsWith("https://")).toBe(true);
+        expect(s.observedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      }
+    }
+  });
+
+  it("デッキ採用カードが全てカタログに存在する", () => {
+    for (const d of DECKS) {
+      for (const e of d.entries) {
+        expect(cardsById.has(e.cardId)).toBe(true);
+      }
+      for (const r of d.results) {
+        expect(r.deckId).toBe(d.id);
+      }
+    }
   });
 });
