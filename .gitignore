@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.dev/
+.loops/
+*.local
+.DS_Store
+
+# Cloudflare
+.wrangler/
+.dev.vars
