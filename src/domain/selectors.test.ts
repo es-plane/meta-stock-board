@@ -45,10 +45,10 @@ describe("statsDeck / scoreDeck", () => {
     const deck = DECKS.find((d) => d.id === "gcg-blue-federation")!;
     const resolved = resolveEntries(deck, cardsById);
     const stats = statsDeck(deck, resolved);
-    // 80*4 + 150*4 + 600*4 + 30*2 = 3380
-    expect(stats.totalJpy).toBe(3380);
-    // must: 80*4 + 150*4 = 920
-    expect(stats.mustJpy).toBe(920);
+    // 80*4 + 80*4 + 30*4 + 30*2 = 820
+    expect(stats.totalJpy).toBe(820);
+    // must: 80*4 + 80*4 = 640
+    expect(stats.mustJpy).toBe(640);
     expect(stats.priorityScore).toBeGreaterThanOrEqual(0);
     expect(stats.priorityScore).toBeLessThanOrEqual(100);
   });
@@ -61,9 +61,9 @@ describe("statsDeck / scoreDeck", () => {
 });
 
 describe("crossDeckDemand", () => {
-  it("補給作戦が3デッキ採用で首位になる", () => {
+  it("物資の輸送が3デッキ採用で首位になる", () => {
     const rows = crossDeckDemand(DECKS, idx(CARDS));
-    expect(rows[0].card.id).toBe("gcg-supply-u");
+    expect(rows[0].card.id).toBe("gcg-gd01-102");
     expect(rows[0].deckCount).toBe(3);
   });
 });
@@ -75,6 +75,37 @@ describe("catalog品質（価格ソース）", () => {
     expect(gundam.color).toBe("青");
   });
 
+  it("外ループ確定の正しい品番・色・価格である", () => {
+    const byCode = new Map(CARDS.map((c) => [c.setCode, c]));
+    expect(byCode.get("ST01-010")!.priceJpy).toBe(80);
+    const char = byCode.get("GD05-093")!;
+    expect(char.color).toBe("紫");
+    expect(char.priceJpy).toBe(120);
+    const zgok = byCode.get("GD03-027")!;
+    expect(zgok.color).toBe("緑");
+    expect(zgok.priceJpy).toBe(30);
+    const wing = byCode.get("GD01-024")!;
+    expect(wing.color).toBe("緑");
+    expect(wing.priceJpy).toBe(980);
+    const heero = byCode.get("GD05-098")!;
+    expect(heero.color).toBe("白");
+    expect(heero.priceJpy).toBe(80);
+    const zaku = byCode.get("GD01-035")!;
+    expect(zaku.priceJpy).toBe(80);
+    const busshi = byCode.get("GD01-102")!;
+    expect(busshi.priceJpy).toBe(30);
+    // 誤品番は存在しない
+    for (const code of ["GD02-008", "GD02-031", "GD03-002", "GD03-015", "GD01-040", "GD01-090"]) {
+      expect(byCode.has(code)).toBe(false);
+    }
+  });
+
+  it("全カードの価格がソース確認済みである", () => {
+    for (const c of CARDS) {
+      expect(c.priceVerified).toBe(true);
+    }
+  });
+
   it("全カードが1件以上のhttps価格ソースを持つ", () => {
     for (const c of CARDS) {
       expect(c.priceSources.length).toBeGreaterThanOrEqual(1);
@@ -82,6 +113,15 @@ describe("catalog品質（価格ソース）", () => {
         expect(s.url.startsWith("https://")).toBe(true);
         expect(s.observedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       }
+    }
+  });
+
+  it("価格ソースに公式カードリストを使わない（メルカード主役）", () => {
+    for (const c of CARDS) {
+      for (const s of c.priceSources) {
+        expect(s.url).not.toContain("gundam-gcg.com");
+      }
+      expect(c.priceSources.some((s) => s.url.includes("mercardgundam.jp"))).toBe(true);
     }
   });
 

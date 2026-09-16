@@ -32,8 +32,10 @@ Deck 1──< TopResult（入賞実績: 大会・日付・順位・参加人数�
 - 価格は `priceJpy + priceUpdatedAt + trend` をセットで更新。単価だけ変えない。
 - **価格更新には必ず `priceSources`（1件以上のhttpsリンク＋確認日）を付ける。ソースなしの価格は却下。**
   確認できたものだけ `priceVerified: true` にする。未確認は `false` のまま「参考」表示になる。
+- **価格ソースの主役はメルカード**（`mercardSearch(品番)`＝品番keyword検索＋個別商品ページ）。
+  公式カードリスト（gundam-gcg.com）は使い物にならないため参照リンクに使わない（テストで禁止を固定）。
 - パラレル版（LR+/LR++等）は別相場。`priceSources[].note` に区別を明記する。
-- レアリティ・品番は公式カード詳細で確認する（例: GD01-001=LR・青。UR表記は誤りだった実績あり）。
+- レアリティ・品番はメルカードの検索結果・商品ページで確認する。
 - 環境切替わりは `Environment` を追加し `isCurrent` を付け替え。旧環境の `Deck` は残す（履歴）。
 - `sharePct/topCount` は推定値でもよいが `sourceUrls/results` の裏付けを残す。
 - ポケカ追加時は `Game(status)` を `active` にし、`gameId: "pokemon"` の行を追加するだけ。UI改修不要。

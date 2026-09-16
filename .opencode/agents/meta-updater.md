@@ -28,7 +28,9 @@ model: musespark-1.3
    `reprintRisk / staple` を見直す。中央値を使い、最安単独は使わない。
    価格には必ず `priceSources`（1件以上のhttpsリンク＋確認日 `observedAt`）を付け、
    ソースで確認できたものだけ `priceVerified: true` にする。
-   レアリティ・品番は公式カード詳細で確認する（GD01-001=LR・青が正の実績あり）。
+   ソースの主役はメルカード: `src/data/catalog.ts` の `mercardSearch(品番)` で検索し、
+   商品ページの通常版価格を採用する。公式カードリスト（gundam-gcg.com）は使わない。
+   レアリティ・品番もメルカードの検索結果・商品ページで確認する。
 5. `stockNote` はせどり視点で1–2文に要約し直す（煽り表現なし）。
 6. 検証: `npm run typecheck && npm run test -- --run && npm run build` を実行する。
 7. `update-report.md`（作業ディレクトリ直下に出力せず、応答本文に含める）に
